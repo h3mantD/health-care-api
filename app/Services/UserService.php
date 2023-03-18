@@ -19,8 +19,6 @@ class UserService extends BaseService
 
             if (!User::find($authUser->id)->checkRole($role)) {
                 return $this->logout($request, false, 'Role does not match');
-            } else {
-                return $this->returnResponseAfterUserIsLoggedIn($role);
             }
 
             return response()->json(['status' => true, 'message' => 'User logged in!']);

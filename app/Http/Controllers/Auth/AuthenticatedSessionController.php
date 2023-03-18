@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Tzsk\Otp\Facades\Otp;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -49,15 +50,12 @@ class AuthenticatedSessionController extends Controller
 
             $user = User::whereAadharNo($request->aadhar_no)->first();
             if (!$user) {
-                throw new \Exception('User does not exists');
+                throw new \Exception('Invalid aadhar no!');
             }
 
-            $otp = rand(10000, 99999);
-            $user->otp = $otp;
+            $otp = Otp::generate($user->email);
 
             Mail::to($user->email)->send(new SendOtpMail(otp: $otp));
-
-            $user->save();
 
             return response()->json(['status' => true, 'message' => 'otp sent!']);
         } catch (\Throwable $th) {
@@ -72,13 +70,10 @@ class AuthenticatedSessionController extends Controller
 
             $user = User::whereAadharNo($request->aadhar_no)->first();
             if (!$user) {
-                throw new \Exception('User does not exists');
+                throw new \Exception('Invalid aadhar no!');
             }
 
-            if ($user->otp == $request->otp) {
-                $user->otp = null;
-                $user->save();
-
+            if (Otp::check($request->otp, $user->email)) {
                 session(['user_id' => $user->id]);
                 return response()->json(['status' => true, 'message' => 'otp verified!']);
             }

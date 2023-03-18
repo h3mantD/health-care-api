@@ -113,13 +113,20 @@ class DocController extends Controller
             $this->setUser();
             if ($this->checkForPatientsConsent()) {
                 $validated = $request->validated();
+
                 $validated['doctor_id'] = Auth::user()->id;
 
+                // dd($validated);
                 $consultation = Consultation::create($validated);
+
+                PatientConsultation::create([
+                    'patient_id' => $this->patient->id,
+                    'consultation_id' => $consultation->id,
+                ]);
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Create Consultation',
+                    'message' => 'Created Consultation',
                     'consultation' => $consultation,
                 ]);
             }

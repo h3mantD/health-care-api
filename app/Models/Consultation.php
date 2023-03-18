@@ -9,7 +9,7 @@ class Consultation extends Model
 {
     protected $collection = 'consultations';
 
-    protected $fillable = ['doctor_id', 'symptons', 'diagnosis', 'suggested_treatment', 'tests'];
+    protected $fillable = ['doctor_id', 'symptoms', 'diagnosis', 'suggested_treatment', 'tests'];
 
     protected $with = ['doctor'];
 
